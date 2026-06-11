@@ -55,7 +55,7 @@
 
     <div class="print-surat container mx-auto px-4 mt-4">
         <div class="kop-surat">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Lambang_Kabupaten_Sumedang.svg" alt="Logo Kab Sumedang" style="width: 70px; height: auto;">
+            <img src="logo.png" alt="Logo Kab Sumedang" style="width: 70px; height: auto;">
             <div class="kop-teks">
                 <h2 class="text-lg font-bold uppercase tracking-tight leading-tight">Pemerintah Kabupaten Sumedang</h2>
                 <h1 class="text-2xl font-bold uppercase tracking-wide leading-tight">Dinas Pendidikan</h1>
@@ -131,10 +131,14 @@
 
             <div class="bg-gray-100 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
                 <button type="button" onclick="resetForm()" class="text-xs text-gray-500 hover:text-gray-700 font-semibold px-2 py-1 cursor-pointer">
-                    Reset Seluruh Isian
+                    Reset Isian Lembaga Ini
                 </button>
                 
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="simpanHasilKajian()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-sm flex items-center transition-all cursor-pointer">
+                        💾 Simpan Hasil Kajian
+                    </button>
+                    
                     <button type="button" onclick="generateWordDocument()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-sm flex items-center transition-all cursor-pointer">
                         <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A1 1 0 0112 2.586L15.414 6A1 1 0 0116 6.586V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
                         Unduh File Word (.doc)
@@ -204,20 +208,19 @@
         // Data default bawaan aplikasi jika Local Storage masih kosong
         const dataDefaultLembaga = {
             lkp: [
-                { nama: "LKP KUMON", kecamatan: "Jl. Serma Muhtar No.34-A Kel. Situ Kec. Sumedang Utara", npsn: "Belum Terdaftar", program: "Program Kursus Bahasa Iggris" },
-                { nama: "LKP Ganesha Operation", kecamatan: "Jl. Kartini No. 10 Kel. Regol Wetan, Kec. Sumedang Selatan", npsn: "K9996789", program: "Program Kursus Pendidikan" },
-                { nama: "LKP Komputer Dan Manajemen Actual ( LPKMA ) ", kecamatan: "Jl. P. Geusan Ulun No. 123 Kel. Kota Kulon, Kec. Sumedang Selatan", npsn: "K5659729", program: "Aplikasi Perkantoran, Desain Grafis, Web Programing dan Tata Kecantikan Rambut" }
+                { nama: "LKP KUMON", kecamatan: "Jl. Serma Muhtar No.34-A Kel. Situ Kec. Sumedang Utara", npsn: "Belum Terdaftar", program: "Program Kursus Bahasa Iggris", riwayat: {}, catatan: "" },
+                { nama: "LKP Ganesha Operation", kecamatan: "Jl. Kartini No. 10 Kel. Regol Wetan, Kec. Sumedang Selatan", npsn: "K9996789", program: "Program Kursus Pendidikan", riwayat: {}, catatan: "" },
+                { nama: "LKP Komputer Dan Manajemen Actual ( LPKMA ) ", kecamatan: "Jl. P. Geusan Ulun No. 123 Kel. Kota Kulon, Kec. Sumedang Selatan", riwayat: {}, catatan: "" }
             ],
             pkbm: [
-                { nama: "PKBM Al-Falah", kecamatan: "Sumedang Utara", npsn: "P9961234", program: "Paket A, B, C & Desa Vokasi" },
-                { nama: "PKBM Jatinangor Mandiri", kecamatan: "Jatinangor", npsn: "P9965678", program: "Kesetaraan Paket B & C" }
+                { nama: "PKBM Al-Falah", kecamatan: "Sumedang Utara", npsn: "P9961234", program: "Paket A, B, C & Desa Vokasi", riwayat: {}, catatan: "" },
+                { nama: "PKBM Jatinangor Mandiri", kecamatan: "Jatinangor", npsn: "P9965678", program: "Kesetaraan Paket B & C", riwayat: {}, catatan: "" }
             ]
         };
 
-        // Memuat database dari Local Storage browser, jika kosong gunakan data default
+        // Memuat database utama dari Local Storage host browser
         let daftarLembaga = JSON.parse(localStorage.getItem('SI_KAPIO_DATA_LEMBAGA')) || dataDefaultLembaga;
 
-        // Fungsi untuk mengamankan penyimpanan data ke Local Storage host browser
         function saveToLocalStorage() {
             localStorage.setItem('SI_KAPIO_DATA_LEMBAGA', JSON.stringify(daftarLembaga));
         }
@@ -239,7 +242,7 @@
                 { id: "pkbm_1", komponen: "1. Administrasi & Legalitas", poin: "Surat Permohonan Perpanjangan Izin resmi dari Ketua PKBM" },
                 { id: "pkbm_2", komponen: "1. Administrasi & Legalitas", poin: "Akta Notaris Yayasan Penyelenggara & Pengesahan Kemenkumham" },
                 { id: "pkbm_3", komponen: "2. Teknis & Kurikulum", poin: "Dokumen Kurikulum Merdeka (KOSP) per jenjang paket yang aktif" },
-                { id: "pkbm_4", komponen: "3. Sarana Prasarana", poin: "Foto Sarana Pembelajaran, Ruang Teori, dan Papan Nama Standar" }
+                { id: "pkbm_4", components: "3. Sarana Prasarana", poin: "Foto Sarana Pembelajaran, Ruang Teori, dan Papan Nama Standar" }
             ]
         };
 
@@ -299,6 +302,9 @@
             document.getElementById('lbl-npsn').innerText = lmb.npsn;
             document.getElementById('lbl-kecamatan').innerText = "Kecamatan " + lmb.kecamatan + ", Kab. Sumedang";
             document.getElementById('lbl-program').innerText = lmb.program;
+
+            // Load data riwayat kajian jika ada
+            loadRiwayatKajianLembaga(lmb);
         }
 
         function clearInfoLembaga() {
@@ -308,6 +314,46 @@
             document.getElementById('lbl-npsn').innerText = "-";
             document.getElementById('lbl-kecamatan').innerText = "-";
             document.getElementById('lbl-program').innerText = "-";
+            document.getElementById('catatan-penilik').value = "";
+        }
+
+        // FUNGSI SIMPAN DAN RENDER RIWAYAT KAJIAN KELAYAKAN
+        function simpanHasilKajian() {
+            const idx = document.getElementById('select-lembaga').value;
+            if(idx === "" || idx === undefined) {
+                alert("Pilih lembaga terlebih dahulu sebelum menyimpan hasil kajian!");
+                return;
+            }
+
+            let lmb = daftarLembaga[currentTab][idx];
+            if (!lmb.riwayat) lmb.riwayat = {};
+            
+            // Simpan status ceklis masing-masing indikator instrumen
+            dataInstrumen[currentTab].forEach(item => {
+                const chk = document.getElementById(`check-${item.id}`);
+                lmb.riwayat[item.id] = chk ? chk.checked : false;
+            });
+
+            // Simpan catatan rekomendasi penilik
+            lmb.catatan = document.getElementById('catatan-penilik').value;
+
+            saveToLocalStorage();
+            alert(`Berhasil mengunci & menyimpan hasil kajian untuk: ${lmb.nama}`);
+        }
+
+        function loadRiwayatKajianLembaga(lmb) {
+            // Muat catatan
+            document.getElementById('catatan-penilik').value = lmb.catatan || "";
+            
+            // Muat status ceklis pada elemen form
+            dataInstrumen[currentTab].forEach(item => {
+                const chk = document.getElementById(`check-${item.id}`);
+                if (chk) {
+                    const statusTerakhir = lmb.riwayat ? lmb.riwayat[item.id] || false : false;
+                    chk.checked = statusTerakhir;
+                    toggleRow(item.id);
+                }
+            });
         }
 
         // FUNGSI OPERASIONAL MODAL (INPUT & EDIT)
@@ -350,32 +396,29 @@
             const kecamatan = document.getElementById('modal-kecamatan').value;
             const program = document.getElementById('modal-program').value;
             
-            const dataObj = { nama, kecamatan, npsn, program };
-
-            if (!daftarLembaga[currentTab]) {
-                daftarLembaga[currentTab] = [];
-            }
-
             if (mode === 'tambah') {
+                const dataObj = { nama, kecamatan, npsn, program, riwayat: {}, catatan: "" };
                 daftarLembaga[currentTab].push(dataObj);
                 const targetIdx = daftarLembaga[currentTab].length - 1;
                 saveToLocalStorage();
                 populateSelectLembaga(currentTab, targetIdx);
             } else if (mode === 'edit') {
                 const idx = document.getElementById('modal-index').value;
-                daftarLembaga[currentTab][idx] = dataObj;
+                daftarLembaga[currentTab][idx].nama = nama;
+                daftarLembaga[currentTab][idx].npsn = npsn;
+                daftarLembaga[currentTab][idx].kecamatan = kecamatan;
+                daftarLembaga[currentTab][idx].program = program;
                 saveToLocalStorage();
                 populateSelectLembaga(currentTab, parseInt(idx));
             }
             closeModal();
         }
 
-        // FUNGSI MANAGEMENT BACK-UP DATA (EKSPOR & IMPOR JSON)
+        // BACK-UP UTILITY MANAGEMENT (JSON EKSPOR & IMPOR)
         function eksporDataJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(daftarLembaga, null, 4));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            
             const date = new Date().toISOString().slice(0, 10);
             downloadAnchor.setAttribute("download", `BACKUP_SI_KAPIO_SUMEDANG_${date}.json`);
             document.body.appendChild(downloadAnchor);
@@ -395,27 +438,25 @@
             fileReader.onload = function(e) {
                 try {
                     const dataTerarsip = JSON.parse(e.target.result);
-                    
-                    // Validasi struktur sederhana file JSON sebelum diimpor
                     if (dataTerarsip.lkp || dataTerarsip.pkbm) {
-                        if (confirm("Apakah Anda yakin ingin menimpa data saat ini dengan data dari file backup?")) {
+                        if (confirm("Apakah Anda yakin ingin menimpa seluruh data dan riwayat kajian saat ini?")) {
                             daftarLembaga = dataTerarsip;
                             saveToLocalStorage();
                             switchTab(currentTab);
-                            alert("Data berhasil dipulihkan dari file JSON!");
+                            alert("Seluruh database dan riwayat kajian berhasil dipulihkan!");
                         }
                     } else {
-                        alert("Format berkas cadangan JSON tidak valid!");
+                        alert("Format berkas cadangan JSON tidak cocok!");
                     }
                 } catch (err) {
-                    alert("Gagal membaca berkas. Pastikan file berupa .json murni.");
+                    alert("Gagal memproses file JSON.");
                 }
             };
             fileReader.readAsText(file);
-            event.target.value = ''; // Reset input agar file yang sama bisa diunggah ulang
+            event.target.value = '';
         }
 
-        // TATA LAYANAN INSTRUMEN CHECKLIST
+        // TATA LAYANAN INSTRUMEN CHECKLIST VISUAL
         function renderChecklist(jenis) {
             const container = document.getElementById('checklist-container');
             container.innerHTML = '';
@@ -459,36 +500,46 @@
                 groupWrapper.innerHTML = innerHtmlStructure;
                 container.appendChild(groupWrapper);
             }
+
+            // Panggil loading ulang status setelah komponen ter-render di halaman browser
+            const idx = document.getElementById('select-lembaga').value;
+            if(idx !== "" && daftarLembaga[jenis][idx]) {
+                loadRiwayatKajianLembaga(daftarLembaga[jenis][idx]);
+            }
         }
 
         function toggleRow(id) {
             const chk = document.getElementById(`check-${id}`);
             const lbl = document.getElementById(`label-${id}`);
-            if (chk.checked) lbl.classList.add('text-emerald-800', 'font-bold');
-            else lbl.classList.remove('text-emerald-800', 'font-bold');
+            if(chk && lbl) {
+                if (chk.checked) lbl.className = "ml-3 font-bold text-emerald-800 cursor-pointer text-xs";
+                else lbl.className = "ml-3 font-medium text-gray-700 cursor-pointer text-xs";
+            }
         }
 
         function handleFile(id) {
             const file = document.getElementById(`file-${id}`);
             const badge = document.getElementById(`badge-${id}`);
             const chk = document.getElementById(`check-${id}`);
-            if (file.files.length > 0) {
-                badge.classList.remove('hidden');
-                chk.checked = true;
-                toggleRow(id);
-            } else {
-                badge.classList.add('hidden');
+            if (file && file.files.length > 0) {
+                if(badge) badge.classList.remove('hidden');
+                if(chk) { chk.checked = true; toggleRow(id); }
             }
         }
 
         function resetForm() {
-            if(confirm("Kosongkan instrumen saat ini?")) {
+            if(confirm("Kosongkan hasil kajian khusus untuk lembaga saat ini?")) {
+                const idx = document.getElementById('select-lembaga').value;
+                if(idx !== "") {
+                    daftarLembaga[currentTab][idx].riwayat = {};
+                    daftarLembaga[currentTab][idx].catatan = "";
+                    saveToLocalStorage();
+                }
                 switchTab(currentTab);
-                document.getElementById('catatan-penilik').value = '';
             }
         }
 
-        // GENERATOR WORD (.DOC)
+        // GENERATOR MICROSOFT WORD DOCUMENT (.DOC)
         function generateWordDocument() {
             const idx = document.getElementById('select-lembaga').value;
             if(idx === "" || idx === undefined) {
@@ -500,7 +551,8 @@
             
             let barisTabelHtml = "";
             dataInstrumen[currentTab].forEach((item, index) => {
-                const isChecked = document.getElementById(`check-${item.id}`).checked;
+                const chk = document.getElementById(`check-${item.id}`);
+                const isChecked = chk ? chk.checked : false;
                 const statusText = isChecked ? "TERPENUHI (VALID)" : "BELUM LENGKAP";
                 barisTabelHtml += `
                     <tr>
@@ -527,19 +579,15 @@
                     <span style="font-size:11pt; font-weight:bold;">BIDANG PEMBINAAN PAUD DAN PENDIDIKAN NONFORMAL (PNF)</span><br/>
                     <i style="font-size:9pt;">Jl. Mayor Abdurahman No. 209, Kotakaler, Sumedang Utara, Kabupaten Sumedang</i>
                 </div>
-                
                 <div class="title">BERITA ACARA KAJIAN AWAL</div>
                 <div style="text-align:center; margin-bottom:20px;">Nomor: 421.9/ ________ /Disdik/2026</div>
-                
                 <p>Pada hari ini, kami selaku Penilik PNF Dinas Pendidikan Kabupaten Sumedang menyatakan telah melakukan kajian dokumen perpanjangan izin terhadap satuan kependidikan:</p>
-                
                 <table style="margin-left:20px; font-weight:bold;">
                     <tr><td>Nama Satuan PNF</td><td>: ${lmb.nama}</td></tr>
                     <tr><td>Nomor NPSN</td><td>: ${lmb.npsn}</td></tr>
                     <tr><td>Kecamatan</td><td>: ${lmb.kecamatan}</td></tr>
                     <tr><td>Program/Layanan</td><td>: ${lmb.program}</td></tr>
                 </table>
-                
                 <p>Dengan rangkuman matriks komponen kelayakan teknis awal sebagai berikut:</p>
                 <table class="table-data">
                     <thead>
@@ -549,14 +597,9 @@
                             <th style="border:1px solid #000; padding:6px; width:150px;">Status Berkas</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${barisTabelHtml}
-                    </tbody>
+                    <tbody>${barisTabelHtml}</tbody>
                 </table>
-                
-                <p><b>CATATAN & REKOMENDASI PENILIK:</b><br/>
-                <i>"${catatan}"</i></p>
-                
+                <p><b>CATATAN & REKOMENDASI PENILIK:</b><br/><i>"${catatan}"</i></p>
                 <br/>
                 <table style="width:100%; margin-top:30px; text-align:center;">
                     <tr>
