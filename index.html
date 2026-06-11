@@ -8,7 +8,7 @@
     <style>
         .custom-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         
-        /* CSS Khusus Layout Cetak PDF (Print Mode) Menyerupai Surat Kedinasan */
+        /* CSS Khusus Layout Cetak PDF (Print Mode) Menyerupai Surat Kedinasan Resmi */
         @media print {
             body { background-color: #ffffff; font-family: 'Times New Roman', Times, serif; color: #000000; }
             header, .no-print, footer, .tab-btn, input[type="file"], .badge-file, .modal { display: none !important; }
@@ -20,6 +20,9 @@
             .table-print { width: 100%; border-collapse: collapse; margin-top: 15px; }
             .table-print th, .table-print td { border: 1px solid #000000; padding: 8px; text-align: left; font-size: 11pt; }
             .table-print th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            /* Memastikan area tanda tangan sejajar sempurna saat cetak kertas */
+            .grid-ttd { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 3rem !important; text-align: center !important; margin-top: 3rem !important; font-size: 11pt !important; }
         }
         .print-surat { display: none; }
     </style>
@@ -143,6 +146,7 @@
                         <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A1 1 0 0112 2.586L15.414 6A1 1 0 0116 6.586V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
                         Unduh File Word (.doc)
                     </button>
+                    
                     <button type="button" onclick="window.print();" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-lg text-xs shadow-sm flex items-center transition-all cursor-pointer">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         Cetak PDF Berita Acara
@@ -151,17 +155,28 @@
             </div>
         </form>
 
-        <div class="print-surat mt-12 grid grid-cols-2 gap-12 text-sm text-center">
-            <div class="mt-4">
-                <p>Mengetahui,</p>
-                <p class="font-semibold mb-20">Pimpinan Lembaga/Satuan PNF</p>
-                <p class="font-bold underline">( _______________________ )</p>
+        <div class="grid-ttd mt-12 hidden grid-cols-2 gap-8 text-sm text-center">
+            <div class="flex flex-col justify-between h-40">
+                <div>
+                    <p class="text-white no-print">&nbsp;</p> <p>Mengetahui,</p>
+                    <p class="font-semibold">Pimpinan Lembaga/Satuan PNF</p>
+                </div>
+                <div>
+                    <p class="font-bold underline">( _______________________ )</p>
+                    <p class="text-xs text-gray-500">Jabatan: ........................................</p>
+                </div>
             </div>
-            <div>
-                <p>Sumedang, ............................ 2026</p>
-                <p class="font-semibold mb-20">Penilik PNF Pengevaluasi,</p>
-                <p class="font-bold underline">( _______________________ )</p>
-                <p class="text-xs text-gray-600">NIP. ........................................</p>
+            
+            <div class="flex flex-col justify-between h-40">
+                <div>
+                    <p>Sumedang, ............................ 2026</p>
+                    <p>Mengevaluasi,</p>
+                    <p class="font-semibold">Penilik PNF Pembina Wilayah</p>
+                </div>
+                <div>
+                    <p class="font-bold underline">( _______________________ )</p>
+                    <p class="text-xs text-gray-700">NIP. ........................................</p>
+                </div>
             </div>
         </div>
     </main>
@@ -242,7 +257,7 @@
                 { id: "pkbm_1", komponen: "1. Administrasi & Legalitas", poin: "Surat Permohonan Perpanjangan Izin resmi dari Ketua PKBM" },
                 { id: "pkbm_2", komponen: "1. Administrasi & Legalitas", poin: "Akta Notaris Yayasan Penyelenggara & Pengesahan Kemenkumham" },
                 { id: "pkbm_3", komponen: "2. Teknis & Kurikulum", poin: "Dokumen Kurikulum Merdeka (KOSP) per jenjang paket yang aktif" },
-                { id: "pkbm_4", components: "3. Sarana Prasarana", poin: "Foto Sarana Pembelajaran, Ruang Teori, dan Papan Nama Standar" }
+                { id: "pkbm_4", komponen: "3. Sarana Prasarana", poin: "Foto Sarana Pembelajaran, Ruang Teori, dan Papan Nama Standar" }
             ]
         };
 
@@ -303,7 +318,6 @@
             document.getElementById('lbl-kecamatan').innerText = "Kecamatan " + lmb.kecamatan + ", Kab. Sumedang";
             document.getElementById('lbl-program').innerText = lmb.program;
 
-            // Load data riwayat kajian jika ada
             loadRiwayatKajianLembaga(lmb);
         }
 
@@ -328,13 +342,11 @@
             let lmb = daftarLembaga[currentTab][idx];
             if (!lmb.riwayat) lmb.riwayat = {};
             
-            // Simpan status ceklis masing-masing indikator instrumen
             dataInstrumen[currentTab].forEach(item => {
                 const chk = document.getElementById(`check-${item.id}`);
                 lmb.riwayat[item.id] = chk ? chk.checked : false;
             });
 
-            // Simpan catatan rekomendasi penilik
             lmb.catatan = document.getElementById('catatan-penilik').value;
 
             saveToLocalStorage();
@@ -342,10 +354,8 @@
         }
 
         function loadRiwayatKajianLembaga(lmb) {
-            // Muat catatan
             document.getElementById('catatan-penilik').value = lmb.catatan || "";
             
-            // Muat status ceklis pada elemen form
             dataInstrumen[currentTab].forEach(item => {
                 const chk = document.getElementById(`check-${item.id}`);
                 if (chk) {
@@ -501,7 +511,6 @@
                 container.appendChild(groupWrapper);
             }
 
-            // Panggil loading ulang status setelah komponen ter-render di halaman browser
             const idx = document.getElementById('select-lembaga').value;
             if(idx !== "" && daftarLembaga[jenis][idx]) {
                 loadRiwayatKajianLembaga(daftarLembaga[jenis][idx]);
@@ -539,7 +548,7 @@
             }
         }
 
-        // GENERATOR MICROSOFT WORD DOCUMENT (.DOC)
+        // GENERATOR MICROSOFT WORD DOCUMENT (.DOC) DENGAN TTD SEJAJAR
         function generateWordDocument() {
             const idx = document.getElementById('select-lembaga').value;
             if(idx === "" || idx === undefined) {
@@ -570,6 +579,8 @@
                 .kop { text-align: center; border-bottom: 3px double #000; padding-bottom: 5px; margin-bottom: 15px; }
                 .title { text-align: center; font-weight: bold; font-size: 12pt; margin-top: 15px; text-decoration: underline; }
                 .table-data { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                .table-ttd { width: 100%; margin-top: 40px; text-align: center; border: none; }
+                .table-ttd td { border: none; vertical-align: top; width: 50%; }
             </style>
             </head>
             <body>
@@ -601,10 +612,25 @@
                 </table>
                 <p><b>CATATAN & REKOMENDASI PENILIK:</b><br/><i>"${catatan}"</i></p>
                 <br/>
-                <table style="width:100%; margin-top:30px; text-align:center;">
+                
+                <table class="table-ttd">
                     <tr>
-                        <td style="width:50%;">Mengetahui,<br/>Pimpinan Satuan PNF<br/><br/><br/><br/><br/>( _______________________ )</td>
-                        <td style="width:50%;">Sumedang, ________________ 2026<br/>Penilik PNF Pengevaluasi,<br/><br/><br/><br/><br/>( _______________________ )</td>
+                        <td>
+                            <br/>
+                            Mengetahui,<br/>
+                            <b>Pimpinan Satuan PNF</b>
+                            <br/><br/><br/><br/><br/>
+                            ( _______________________ )<br/>
+                            <span style="font-size:9pt; color:#555;">Jabatan: .............................</span>
+                        </td>
+                        <td>
+                            Sumedang, ________________ 2026<br/>
+                            Mengevaluasi,<br/>
+                            <b>Penilik PNF Pembina Wilayah</b>
+                            <br/><br/><br/><br/><br/>
+                            ( _______________________ )<br/>
+                            <span style="font-size:9pt; color:#555;">NIP. ........................................</span>
+                        </td>
                     </tr>
                 </table>
             </body>
