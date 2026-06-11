@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-KAPIO: Dinas Pendidikan Kab. Sumedang</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .custom-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        
+        /* CSS Khusus Layout Cetak PDF (Print Mode) Menyerupai Surat Kedinasan */
+        @media print {
+            body { background-color: #ffffff; font-family: 'Times New Roman', Times, serif; color: #000000; }
+            header, .no-print, footer, .tab-btn, input[type="file"], .badge-file, .modal { display: none !important; }
+            main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            .custom-shadow { box-shadow: none !important; border: none !important; }
+            .print-surat { display: block !important; }
+            .kop-surat { display: flex !important; border-bottom: 4px double #000000; padding-bottom: 8px; margin-bottom: 20px; flex-direction: row; align-items: center; justify-content: center; gap: 20px; }
+            .kop-teks { text-align: center; }
+            .table-print { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .table-print th, .table-print td { border: 1px solid #000000; padding: 8px; text-align: left; font-size: 11pt; }
+            .table-print th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+        .print-surat { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased">
+
+    <header class="bg-emerald-700 text-white shadow-md no-print">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4 text-center md:text-left">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Lambang_Kabupaten_Sumedang.svg" 
+                     alt="Logo Kab Sumedang" 
+                     class="w-14 h-auto object-contain bg-white/10 p-1.5 rounded-lg border border-white/20">
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">SI-KAPIO DIKMAS</h1>
+                    <p class="text-xs text-emerald-100 font-medium">Dinas Pendidikan Kabupaten Sumedang — Bidang Pembinaan PAUD & PNF</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="eksporDataJSON()" class="bg-emerald-600 hover:bg-emerald-500 border border-emerald-500 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" title="Unduh Backup Data ke Komputer">
+                    📤 Ekspor JSON
+                </button>
+                <button onclick="triggerInputFile()" class="bg-emerald-600 hover:bg-emerald-500 border border-emerald-500 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer" title="Pulihkan Data dari File Backup">
+                    📥 Impor JSON
+                </button>
+                <input type="file" id="input-file-json" accept=".json" class="hidden" onchange="imporDataJSON(event)">
+
+                <div class="bg-emerald-800 px-3 py-1.5 rounded-lg text-xs border border-emerald-600">
+                    <span class="font-semibold text-emerald-200">Akses:</span> Penilik PNF
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="print-surat container mx-auto px-4 mt-4">
+        <div class="kop-surat">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Lambang_Kabupaten_Sumedang.svg" alt="Logo Kab Sumedang" style="width: 70px; height: auto;">
+            <div class="kop-teks">
+                <h2 class="text-lg font-bold uppercase tracking-tight leading-tight">Pemerintah Kabupaten Sumedang</h2>
+                <h1 class="text-2xl font-bold uppercase tracking-wide leading-tight">Dinas Pendidikan</h1>
+                <h3 class="text-sm font-semibold uppercase tracking-normal">Bidang Pembinaan PAUD dan Pendidikan Nonformal (PNF)</h3>
+                <p class="text-xs italic mt-1">Jl. Mayor Abdurahman No. 209, Kotakaler, Sumedang Utara, Kabupaten Sumedang, Jawa Barat 45322</p>
+            </div>
+        </div>
+        
+        <div class="text-center my-6">
+            <h3 class="text-base font-bold uppercase tracking-wide underline">BERITA ACARA KAJIAN AWAL</h3>
+            <p class="text-sm font-medium">Nomor: 421.9/ <span class="border-b border-dotted border-black px-8"></span> /Disdik/2026</p>
+        </div>
+
+        <p class="text-justify leading-relaxed text-sm mb-4">
+            Pada hari ini, Dinas Pendidikan Kabupaten Sumedang melalui Penilik PNF/Dikmas Pembina Wilayah telah melakukan Kajian Awal secara digital dan verifikasi berkas fisik permohonan Perpanjangan Izin Operasional terhadap satuan pendidikan nonformal di bawah ini:
+        </p>
+    </div>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <div class="bg-white p-5 rounded-xl custom-shadow mb-6 border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-gray-700 font-bold text-xs uppercase tracking-wider">1. Jenis Satuan:</label>
+                    <button type="button" onclick="openModal('tambah')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-xs transition-all cursor-pointer">
+                        + Tambah Lembaga
+                    </button>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <button type="button" onclick="switchTab('lkp')" id="btn-lkp" class="py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-emerald-50 border-emerald-600 text-emerald-700 cursor-pointer">
+                        LKP (Lembaga Kursus)
+                    </button>
+                    <button type="button" onclick="switchTab('pkbm')" id="btn-pkbm" class="py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-white border-gray-300 text-gray-600 hover:border-emerald-500 cursor-pointer">
+                        PKBM (Kesetaraan)
+                    </button>
+                </div>
+            </div>
+
+            <div class="md:col-span-2">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-gray-700 font-bold text-xs uppercase tracking-wider">2. Pilih Nama Lembaga Kerja:</label>
+                    <button type="button" onclick="openModal('edit')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-xs transition-all cursor-pointer">
+                        ✏️ Edit Data Terpilih
+                    </button>
+                </div>
+                <select id="select-lembaga" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-gray-50 text-xs font-semibold" onchange="updateInfoLembaga()">
+                    </select>
+
+                <div class="mt-2.5 bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-xs text-gray-600 grid grid-cols-2 gap-2">
+                    <div><strong>Kecamatan:</strong> <span id="info-kecamatan">-</span></div>
+                    <div><strong>NPSN / Bidang:</strong> <span id="info-npsn">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-4 rounded-lg border border-gray-300 text-sm font-mono space-y-1 mb-6 md:max-w-md">
+            <div><strong>Nama Satuan PNF :</strong> <span id="lbl-nama" class="font-bold">-</span></div>
+            <div><strong>Nomor NPSN     :</strong> <span id="lbl-npsn">-</span></div>
+            <div><strong>Wilayah Kerja   :</strong> <span id="lbl-kecamatan">-</span></div>
+            <div><strong>Fokus Layanan   :</strong> <span id="lbl-program">-</span></div>
+        </div>
+
+        <form id="form-kajian" onsubmit="event.preventDefault();">
+            <div id="checklist-container" class="space-y-4 mb-6">
+                </div>
+
+            <div class="bg-white p-5 rounded-xl custom-shadow mb-6 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-800 mb-2 uppercase tracking-wide flex items-center">
+                    Catatan Koreksi & Rekomendasi Hasil Kajian Awal
+                </h3>
+                <textarea id="catatan-penilik" rows="3" class="w-full p-3 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Tuliskan rekomendasi atau dokumen yang harus diperbaiki oleh lembaga..."></textarea>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
+                <button type="button" onclick="resetForm()" class="text-xs text-gray-500 hover:text-gray-700 font-semibold px-2 py-1 cursor-pointer">
+                    Reset Seluruh Isian
+                </button>
+                
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="generateWordDocument()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs shadow-sm flex items-center transition-all cursor-pointer">
+                        <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A1 1 0 0112 2.586L15.414 6A1 1 0 0116 6.586V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
+                        Unduh File Word (.doc)
+                    </button>
+                    <button type="button" onclick="window.print();" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-lg text-xs shadow-sm flex items-center transition-all cursor-pointer">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Cetak PDF Berita Acara
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="print-surat mt-12 grid grid-cols-2 gap-12 text-sm text-center">
+            <div class="mt-4">
+                <p>Mengetahui,</p>
+                <p class="font-semibold mb-20">Pimpinan Lembaga/Satuan PNF</p>
+                <p class="font-bold underline">( _______________________ )</p>
+            </div>
+            <div>
+                <p>Sumedang, ............................ 2026</p>
+                <p class="font-semibold mb-20">Penilik PNF Pengevaluasi,</p>
+                <p class="font-bold underline">( _______________________ )</p>
+                <p class="text-xs text-gray-600">NIP. ........................................</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-lembaga" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4 no-print">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div id="modal-header" class="bg-emerald-700 text-white px-4 py-3 font-bold text-sm uppercase tracking-wide">
+                Form Data Lembaga
+            </div>
+            <form id="form-modal" class="p-4 space-y-3" onsubmit="saveModalData(event)">
+                <input type="hidden" id="modal-mode">
+                <input type="hidden" id="modal-index">
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold text-xs mb-1">Nama Satuan/Lembaga PNF:</label>
+                    <input type="text" id="modal-nama" required class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold text-xs mb-1">Nomor Pokok Satuan Nasional (NPSN):</label>
+                    <input type="text" id="modal-npsn" required class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold text-xs mb-1">Wilayah Kecamatan (di Kab. Sumedang):</label>
+                    <input type="text" id="modal-kecamatan" required class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Contoh: Sumedang Utara, Jatinangor">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold text-xs mb-1">Fokus Layanan / Program Keterampilan:</label>
+                    <input type="text" id="modal-program" required class="w-full p-2 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Contoh: Paket B & C / Kursus Otomotif">
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+                    <button type="button" onclick="closeModal()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded cursor-pointer">Batal</button>
+                    <button type="submit" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded cursor-pointer">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-500 text-center py-4 text-xs no-print">
+        &copy; 2026 SI-KAPIO. Tim Kerja Penilik PAUD & PNF Dinas Pendidikan Kab. Sumedang.
+    </footer>
+
+    <script>
+        // Data default bawaan aplikasi jika Local Storage masih kosong
+        const dataDefaultLembaga = {
+            lkp: [
+                { nama: "LKP Bina Mutu Bangsa", kecamatan: "Sumedang Utara", npsn: "K5654321", program: "Aplikasi Perkantoran & Desain" },
+                { nama: "LKP Kartika Jaya", kecamatan: "Jatinangor", npsn: "K5659876", program: "Tata Busana Terampil" },
+                { nama: "LKP Sumedang Cantik", kecamatan: "Sumedang Selatan", npsn: "K5661122", program: "Tata Kecantikan Rambut" }
+            ],
+            pkbm: [
+                { nama: "PKBM Al-Falah", kecamatan: "Sumedang Utara", npsn: "P9961234", program: "Paket A, B, C & Desa Vokasi" },
+                { nama: "PKBM Jatinangor Mandiri", kecamatan: "Jatinangor", npsn: "P9965678", program: "Kesetaraan Paket B & C" }
+            ]
+        };
+
+        // Memuat database dari Local Storage browser, jika kosong gunakan data default
+        let daftarLembaga = JSON.parse(localStorage.getItem('SI_KAPIO_DATA_LEMBAGA')) || dataDefaultLembaga;
+
+        // Fungsi untuk mengamankan penyimpanan data ke Local Storage host browser
+        function saveToLocalStorage() {
+            localStorage.setItem('SI_KAPIO_DATA_LEMBAGA', JSON.stringify(daftarLembaga));
+        }
+
+        const dataInstrumen = {
+            lkp: [
+                { id: "lkp_1", komponen: "1. Administrasi & Legalitas", poin: "Surat Permohonan Perpanjangan kepada Kepala Disdik/DPMPTSP Sumedang" },
+                { id: "lkp_2", komponen: "1. Administrasi & Legalitas", poin: "Salinan SK Izin Operasional LKP lama yang asli/legalisir" },
+                { id: "lkp_prog_1", komponen: "2. Program Layanan Kursus", poin: "Dokumen Spesifikasi Program Kursus Terbuka (Struktur Program & Durasi Jam Belajar)" },
+                { id: "lkp_prog_2", komponen: "2. Program Layanan Kursus", poin: "Kesesuaian Daya Tampung Kelas dan Rasio Instruktur dengan Jumlah Peserta Didik Aktif" },
+                { id: "lkp_prog_3", komponen: "2. Program Layanan Kursus", poin: "Kelengkapan Modul Ajar/Buku Panduan Praktik Kerja Mandiri bagi Peserta Kursus" },
+                { id: "lkp_kur_1", komponen: "3. Kurikulum Lembaga", poin: "Dokumen Kurikulum Berbasis Kompetensi (KBK) / Kurikulum Merdeka PNF yang disahkan pimpinan" },
+                { id: "lkp_kur_2", komponen: "3. Kurikulum Lembaga", poin: "Bukti Sinkronisasi & Penyelarasan Kurikulum dengan Standar IDUKA (Industri dan Dunia Kerja)" },
+                { id: "lkp_kur_3", komponen: "3. Kurikulum Lembaga", poin: "Rencana Pelaksanaan Pembelajaran (RPP) / Alur Tujuan Pembelajaran (ATP) tiap pertemuan" },
+                { id: "lkp_5", komponen: "4. Sarana Prasarana", poin: "Bukti Status Kepemilikan/Sewa Tempat Pembelajaran di Sumedang" },
+                { id: "lkp_6", komponen: "4. Sarana Prasarana", poin: "Ketersediaan Peralatan Praktik yang Layak dan Sesuai dengan Kebutuhan Program Layanan" }
+            ],
+            pkbm: [
+                { id: "pkbm_1", komponen: "1. Administrasi & Legalitas", poin: "Surat Permohonan Perpanjangan Izin resmi dari Ketua PKBM" },
+                { id: "pkbm_2", komponen: "1. Administrasi & Legalitas", poin: "Akta Notaris Yayasan Penyelenggara & Pengesahan Kemenkumham" },
+                { id: "pkbm_3", komponen: "2. Teknis & Kurikulum", poin: "Dokumen Kurikulum Merdeka (KOSP) per jenjang paket yang aktif" },
+                { id: "pkbm_4", komponen: "3. Sarana Prasarana", poin: "Foto Sarana Pembelajaran, Ruang Teori, dan Papan Nama Standar" }
+            ]
+        };
+
+        let currentTab = 'lkp';
+
+        function switchTab(jenis) {
+            currentTab = jenis;
+            const btnLkp = document.getElementById('btn-lkp');
+            const btnPkbm = document.getElementById('btn-pkbm');
+            
+            if (jenis === 'lkp') {
+                btnLkp.className = "py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-emerald-50 border-emerald-600 text-emerald-700 cursor-pointer";
+                btnPkbm.className = "py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-white border-gray-300 text-gray-600 hover:border-emerald-500 cursor-pointer";
+            } else {
+                btnPkbm.className = "py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-emerald-50 border-emerald-600 text-emerald-700 cursor-pointer";
+                btnLkp.className = "py-2 px-3 rounded-lg font-semibold border text-left transition-all text-xs bg-white border-gray-300 text-gray-600 hover:border-emerald-500 cursor-pointer";
+            }
+            populateSelectLembaga(jenis);
+            renderChecklist(jenis);
+        }
+
+        function populateSelectLembaga(jenis, selectedIndex = 0) {
+            const select = document.getElementById('select-lembaga');
+            select.innerHTML = '';
+            
+            if (!daftarLembaga[jenis] || daftarLembaga[jenis].length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.innerText = "-- Tidak Ada Data Lembaga --";
+                select.appendChild(opt);
+                clearInfoLembaga();
+                return;
+            }
+
+            daftarLembaga[jenis].forEach((lmb, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = `${lmb.nama} (${lmb.kecamatan})`;
+                if(idx === selectedIndex) opt.selected = true;
+                select.appendChild(opt);
+            });
+            updateInfoLembaga();
+        }
+
+        function updateInfoLembaga() {
+            const idx = document.getElementById('select-lembaga').value;
+            if(idx === "" || idx === undefined) {
+                clearInfoLembaga();
+                return;
+            }
+            const lmb = daftarLembaga[currentTab][idx];
+            
+            document.getElementById('info-kecamatan').innerText = "Kec. " + lmb.kecamatan;
+            document.getElementById('info-npsn').innerText = lmb.npsn + " (" + lmb.program + ")";
+            
+            document.getElementById('lbl-nama').innerText = lmb.nama;
+            document.getElementById('lbl-npsn').innerText = lmb.npsn;
+            document.getElementById('lbl-kecamatan').innerText = "Kecamatan " + lmb.kecamatan + ", Kab. Sumedang";
+            document.getElementById('lbl-program').innerText = lmb.program;
+        }
+
+        function clearInfoLembaga() {
+            document.getElementById('info-kecamatan').innerText = "-";
+            document.getElementById('info-npsn').innerText = "-";
+            document.getElementById('lbl-nama').innerText = "-";
+            document.getElementById('lbl-npsn').innerText = "-";
+            document.getElementById('lbl-kecamatan').innerText = "-";
+            document.getElementById('lbl-program').innerText = "-";
+        }
+
+        // FUNGSI OPERASIONAL MODAL (INPUT & EDIT)
+        function openModal(mode) {
+            const modal = document.getElementById('modal-lembaga');
+            const header = document.getElementById('modal-header');
+            document.getElementById('form-modal').reset();
+            document.getElementById('modal-mode').value = mode;
+
+            if (mode === 'tambah') {
+                header.innerText = `Tambah Lembaga ${currentTab.toUpperCase()} Baru`;
+                modal.classList.remove('hidden');
+            } else if (mode === 'edit') {
+                const idx = document.getElementById('select-lembaga').value;
+                if (idx === "") {
+                    alert("Pilih lembaga terlebih dahulu untuk diedit!");
+                    return;
+                }
+                header.innerText = `Edit Data Lembaga ${currentTab.toUpperCase()}`;
+                const data = daftarLembaga[currentTab][idx];
+                
+                document.getElementById('modal-index').value = idx;
+                document.getElementById('modal-nama').value = data.nama;
+                document.getElementById('modal-npsn').value = data.npsn;
+                document.getElementById('modal-kecamatan').value = data.kecamatan;
+                document.getElementById('modal-program').value = data.program;
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal-lembaga').classList.add('hidden');
+        }
+
+        function saveModalData(e) {
+            e.preventDefault();
+            const mode = document.getElementById('modal-mode').value;
+            const nama = document.getElementById('modal-nama').value;
+            const npsn = document.getElementById('modal-npsn').value;
+            const kecamatan = document.getElementById('modal-kecamatan').value;
+            const program = document.getElementById('modal-program').value;
+            
+            const dataObj = { nama, kecamatan, npsn, program };
+
+            if (!daftarLembaga[currentTab]) {
+                daftarLembaga[currentTab] = [];
+            }
+
+            if (mode === 'tambah') {
+                daftarLembaga[currentTab].push(dataObj);
+                const targetIdx = daftarLembaga[currentTab].length - 1;
+                saveToLocalStorage();
+                populateSelectLembaga(currentTab, targetIdx);
+            } else if (mode === 'edit') {
+                const idx = document.getElementById('modal-index').value;
+                daftarLembaga[currentTab][idx] = dataObj;
+                saveToLocalStorage();
+                populateSelectLembaga(currentTab, parseInt(idx));
+            }
+            closeModal();
+        }
+
+        // FUNGSI MANAGEMENT BACK-UP DATA (EKSPOR & IMPOR JSON)
+        function eksporDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(daftarLembaga, null, 4));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            
+            const date = new Date().toISOString().slice(0, 10);
+            downloadAnchor.setAttribute("download", `BACKUP_SI_KAPIO_SUMEDANG_${date}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerInputFile() {
+            document.getElementById('input-file-json').click();
+        }
+
+        function imporDataJSON(event) {
+            const fileReader = new FileReader();
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileReader.onload = function(e) {
+                try {
+                    const dataTerarsip = JSON.parse(e.target.result);
+                    
+                    // Validasi struktur sederhana file JSON sebelum diimpor
+                    if (dataTerarsip.lkp || dataTerarsip.pkbm) {
+                        if (confirm("Apakah Anda yakin ingin menimpa data saat ini dengan data dari file backup?")) {
+                            daftarLembaga = dataTerarsip;
+                            saveToLocalStorage();
+                            switchTab(currentTab);
+                            alert("Data berhasil dipulihkan dari file JSON!");
+                        }
+                    } else {
+                        alert("Format berkas cadangan JSON tidak valid!");
+                    }
+                } catch (err) {
+                    alert("Gagal membaca berkas. Pastikan file berupa .json murni.");
+                }
+            };
+            fileReader.readAsText(file);
+            event.target.value = ''; // Reset input agar file yang sama bisa diunggah ulang
+        }
+
+        // TATA LAYANAN INSTRUMEN CHECKLIST
+        function renderChecklist(jenis) {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            const items = dataInstrumen[jenis];
+
+            const kelompokKomponen = {};
+            items.forEach(item => {
+                if (!kelompokKomponen[item.komponen]) {
+                    kelompokKomponen[item.komponen] = [];
+                }
+                kelompokKomponen[item.komponen].push(item);
+            });
+
+            for (const namaKomponen in kelompokKomponen) {
+                const groupWrapper = document.createElement('div');
+                groupWrapper.className = "mb-4 border border-gray-200 rounded-xl overflow-hidden bg-white shadow-xs text-xs";
+                
+                let innerHtmlStructure = `
+                    <div class="bg-gray-100 font-bold px-4 py-2 border-b border-gray-200 text-gray-700 uppercase tracking-wider text-[11px]">
+                        ${namaKomponen}
+                    </div>
+                    <div class="divide-y divide-gray-100 px-4">
+                `;
+
+                kelompokKomponen[namaKomponen].forEach(item => {
+                    innerHtmlStructure += `
+                        <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start flex-1">
+                                <input type="checkbox" id="check-${item.id}" class="mt-0.5 h-4 w-4 text-emerald-600 border-gray-300 rounded cursor-pointer" onchange="toggleRow('${item.id}')">
+                                <label for="check-${item.id}" id="label-${item.id}" class="ml-3 font-medium text-gray-700 cursor-pointer text-xs">${item.poin}</label>
+                            </div>
+                            <div class="flex items-center space-x-2 no-print">
+                                <input type="file" id="file-${item.id}" class="text-[11px] text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer" onchange="handleFile('${item.id}')">
+                                <span id="badge-${item.id}" class="badge-file hidden bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">OK</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                innerHtmlStructure += `</div>`;
+                groupWrapper.innerHTML = innerHtmlStructure;
+                container.appendChild(groupWrapper);
+            }
+        }
+
+        function toggleRow(id) {
+            const chk = document.getElementById(`check-${id}`);
+            const lbl = document.getElementById(`label-${id}`);
+            if (chk.checked) lbl.classList.add('text-emerald-800', 'font-bold');
+            else lbl.classList.remove('text-emerald-800', 'font-bold');
+        }
+
+        function handleFile(id) {
+            const file = document.getElementById(`file-${id}`);
+            const badge = document.getElementById(`badge-${id}`);
+            const chk = document.getElementById(`check-${id}`);
+            if (file.files.length > 0) {
+                badge.classList.remove('hidden');
+                chk.checked = true;
+                toggleRow(id);
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function resetForm() {
+            if(confirm("Kosongkan instrumen saat ini?")) {
+                switchTab(currentTab);
+                document.getElementById('catatan-penilik').value = '';
+            }
+        }
+
+        // GENERATOR WORD (.DOC)
+        function generateWordDocument() {
+            const idx = document.getElementById('select-lembaga').value;
+            if(idx === "" || idx === undefined) {
+                alert("Tidak ada data lembaga untuk diunduh!");
+                return;
+            }
+            const lmb = daftarLembaga[currentTab][idx];
+            const catatan = document.getElementById('catatan-penilik').value || "Tidak ada catatan koreksi khusus.";
+            
+            let barisTabelHtml = "";
+            dataInstrumen[currentTab].forEach((item, index) => {
+                const isChecked = document.getElementById(`check-${item.id}`).checked;
+                const statusText = isChecked ? "TERPENUHI (VALID)" : "BELUM LENGKAP";
+                barisTabelHtml += `
+                    <tr>
+                        <td style="border:1px solid #000; padding:6px; text-align:center;">${index + 1}</td>
+                        <td style="border:1px solid #000; padding:6px;"><b>[${item.komponen}]</b> ${item.poin}</td>
+                        <td style="border:1px solid #000; padding:6px; text-align:center; font-weight:bold;">${statusText}</td>
+                    </tr>`;
+            });
+
+            const htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head><title>Berita Acara</title>
+            <style>
+                body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.3; }
+                .kop { text-align: center; border-bottom: 3px double #000; padding-bottom: 5px; margin-bottom: 15px; }
+                .title { text-align: center; font-weight: bold; font-size: 12pt; margin-top: 15px; text-decoration: underline; }
+                .table-data { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            </style>
+            </head>
+            <body>
+                <div class="kop">
+                    <b style="font-size:13pt;">PEMERINTAH KABUPATEN SUMEDANG</b><br/>
+                    <b style="font-size:15pt;">DINAS PENDIDIKAN</b><br/>
+                    <span style="font-size:11pt; font-weight:bold;">BIDANG PEMBINAAN PAUD DAN PENDIDIKAN NONFORMAL (PNF)</span><br/>
+                    <i style="font-size:9pt;">Jl. Mayor Abdurahman No. 209, Kotakaler, Sumedang Utara, Kabupaten Sumedang</i>
+                </div>
+                
+                <div class="title">BERITA ACARA KAJIAN AWAL</div>
+                <div style="text-align:center; margin-bottom:20px;">Nomor: 421.9/ ________ /Disdik/2026</div>
+                
+                <p>Pada hari ini, kami selaku Penilik PNF Dinas Pendidikan Kabupaten Sumedang menyatakan telah melakukan kajian dokumen perpanjangan izin terhadap satuan kependidikan:</p>
+                
+                <table style="margin-left:20px; font-weight:bold;">
+                    <tr><td>Nama Satuan PNF</td><td>: ${lmb.nama}</td></tr>
+                    <tr><td>Nomor NPSN</td><td>: ${lmb.npsn}</td></tr>
+                    <tr><td>Kecamatan</td><td>: ${lmb.kecamatan}</td></tr>
+                    <tr><td>Program/Layanan</td><td>: ${lmb.program}</td></tr>
+                </table>
+                
+                <p>Dengan rangkuman matriks komponen kelayakan teknis awal sebagai berikut:</p>
+                <table class="table-data">
+                    <thead>
+                        <tr style="background-color:#e6e6e6;">
+                            <th style="border:1px solid #000; padding:6px; width:40px;">No</th>
+                            <th style="border:1px solid #000; padding:6px;">Indikator Berkas Verifikasi</th>
+                            <th style="border:1px solid #000; padding:6px; width:150px;">Status Berkas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${barisTabelHtml}
+                    </tbody>
+                </table>
+                
+                <p><b>CATATAN & REKOMENDASI PENILIK:</b><br/>
+                <i>"${catatan}"</i></p>
+                
+                <br/>
+                <table style="width:100%; margin-top:30px; text-align:center;">
+                    <tr>
+                        <td style="width:50%;">Mengetahui,<br/>Pimpinan Satuan PNF<br/><br/><br/><br/><br/>( _______________________ )</td>
+                        <td style="width:50%;">Sumedang, ________________ 2026<br/>Penilik PNF Pengevaluasi,<br/><br/><br/><br/><br/>( _______________________ )</td>
+                    </tr>
+                </table>
+            </body>
+            </html>`;
+
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Berita_Acara_Kajian_${lmb.nama.replace(/\s+/g, '_')}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            switchTab('lkp');
+        };
+    </script>
+</body>
+</html>
